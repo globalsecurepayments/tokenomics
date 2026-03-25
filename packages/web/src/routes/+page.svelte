@@ -8,6 +8,20 @@
 	let projects = $state<Project[]>([]);
 	let loading = $state(true);
 	let creating = $state(false);
+	let deleting = $state<string | null>(null);
+
+	async function deleteProject(id: string, name: string) {
+		if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+		deleting = id;
+		try {
+			await api.del(`/api/projects/${id}`);
+			projects = projects.filter(p => p.id !== id);
+		} catch (err) {
+			console.error('Failed to delete:', err);
+		} finally {
+			deleting = null;
+		}
+	}
 
 	// Create modal state
 	let showCreate = $state(false);
@@ -89,15 +103,25 @@
 	{:else}
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 			{#each projects as project}
-				<a
-					href="/project/{project.id}"
-					class="rounded-lg border border-border bg-card p-4 hover:border-primary/30 transition-colors group"
-				>
+				<div class="relative rounded-lg border border-border bg-card p-4 hover:border-primary/30 transition-colors group">
+					<button
+						onclick={(e) => { e.preventDefault(); e.stopPropagation(); deleteProject(project.id, project.name); }}
+						disabled={deleting === project.id}
+						class="absolute top-2 right-2 w-6 h-6 rounded-md flex items-center justify-center text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-all z-10"
+						title="Delete project"
+					>
+						{#if deleting === project.id}
+							<span class="text-xs animate-spin">...</span>
+						{:else}
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-3.5 h-3.5"><path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg>
+						{/if}
+					</button>
+					<a href="/project/{project.id}" class="block">
 					<div class="flex items-center justify-between mb-2">
 						<span class="text-sm font-medium group-hover:text-primary transition-colors">
 							{project.name}
 						</span>
-						<span class="text-xs font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">
+						<span class="text-xs font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded mr-6">
 							${project.tokenSymbol}
 						</span>
 					</div>
@@ -108,7 +132,8 @@
 						<span class="capitalize px-1.5 py-0.5 rounded bg-secondary">{project.status}</span>
 						<span class="tabular-nums">{new Date(project.updatedAt).toLocaleDateString()}</span>
 					</div>
-				</a>
+					</a>
+				</div>
 			{/each}
 		</div>
 	{/if}

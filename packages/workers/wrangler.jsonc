@@ -1,0 +1,38 @@
+{
+  "name": "tokenomics-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-06-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  "durable_objects": {
+    "bindings": [
+      { "name": "PROJECT_STATE", "class_name": "ProjectState" },
+      { "name": "SIMULATION_ENGINE", "class_name": "SimulationEngine" }
+    ]
+  },
+
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["ProjectState", "SimulationEngine"]
+    }
+  ],
+
+  "r2_buckets": [
+    { "binding": "SIM_RESULTS", "bucket_name": "tokenomics-sim-results" }
+  ],
+
+  "kv_namespaces": [
+    { "binding": "TEMPLATES", "id": "placeholder-kv-id" }
+  ],
+
+  "vars": {
+    "ENVIRONMENT": "development",
+    "ADMIN_KEY": "dev-admin-key"
+  },
+
+  "observability": {
+    "enabled": true,
+    "logs": { "head_sampling_rate": 1 }
+  }
+}

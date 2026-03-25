@@ -1,0 +1,16 @@
+{
+  "name": "tokenomics-lab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --filter @tokenomics/web dev",
+    "dev:api": "pnpm --filter @tokenomics/workers dev",
+    "build": "pnpm -r build",
+    "type-check": "pnpm -r type-check",
+    "clean": "pnpm -r clean"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
